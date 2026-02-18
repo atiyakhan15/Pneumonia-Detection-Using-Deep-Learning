@@ -10,6 +10,7 @@ This project implements a transfer learning-based deep learning model for automa
 - PyTorch
 - DenseNet121
 - MedMNIST
+- Resnet50
 
 ## 📊 Results
 - Accuracy: 91%
