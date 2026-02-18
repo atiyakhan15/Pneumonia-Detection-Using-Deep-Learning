@@ -1,0 +1,26 @@
+pneumonia-detection-densenet/
+│
+├── data/
+│   ├── raw/
+│   └── processed/
+│
+├── notebooks/
+│   ├── baseline_cnn.ipynb
+│   └── densenet_transfer_learning.ipynb
+│
+├── src/
+│   ├── model.py
+│   ├── train.py
+│   ├── evaluate.py
+│   └── utils.py
+│
+├── results/
+│   ├── confusion_matrix.png
+│   └── roc_curve.png
+│
+├── models/
+│   └── saved_models/
+│
+├── requirements.txt
+├── .gitignore
+└── README.md
