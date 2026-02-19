@@ -1,2 +1,13 @@
 Chest XRay Images
 https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia
+
+chest_xray/
+ ├── train/
+ │    ├── NORMAL/
+ │    └── PNEUMONIA/
+ ├── val/
+ │    ├── NORMAL/
+ │    └── PNEUMONIA/
+ └── test/
+      ├── NORMAL/
+      └── PNEUMONIA/
