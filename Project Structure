@@ -1,11 +1,12 @@
-pneumonia-detection-densenet/
+pneumonia-detection-deeplearning/
 │
 ├── data/
 │   ├── raw/
 │   └── processed/
 │
 ├── notebooks/
-│   ├── baseline_cnn.ipynb
+│   ├── baseline_CNN.ipynb
+|   └── FineTune_CNN.ipynb 
 │   └── densenet_transfer_learning.ipynb
 │
 ├── src/
@@ -16,8 +17,10 @@ pneumonia-detection-densenet/
 │
 ├── results/
 │   ├── confusion_matrix.png
-│   └── roc_curve.png
-│
+│   └── accuracy_curve.png
+│   └── loss_curve.png
+│   └── precision.png
+│   
 ├── models/
 │   └── saved_models/
 │
