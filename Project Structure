@@ -9,12 +9,6 @@ pneumonia-detection-deeplearning/
 |   └── FineTune_CNN.ipynb 
 │   └── densenet_transfer_learning.ipynb
 │
-├── src/
-│   ├── model.py
-│   ├── train.py
-│   ├── evaluate.py
-│   └── utils.py
-│
 ├── results/
 │   ├── confusion_matrix.png
 │   └── accuracy_curve.png
