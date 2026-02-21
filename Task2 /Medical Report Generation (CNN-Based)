@@ -1,1 +1,254 @@
 
+## Medical Report Generation
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from sklearn.metrics.pairwise import cosine_similarity
+feature_model = model.features
+# Extract embeddings for training images
+train_embeddings = []
+feature_model.eval() # Set the feature model to evaluation mode
+with torch.no_grad(): # Disable gradient calculation
+    for x, _ in train_loader:
+        x = x.to(device)
+        embeddings = feature_model(x).cpu().numpy() # embeddings here are (batch_size, 128, 1, 1)
+        train_embeddings.append(embeddings)
+
+train_embeddings = np.concatenate(train_embeddings, axis=0) # This will be (num_samples, 128, 1, 1)
+train_embeddings = train_embeddings.reshape(train_embeddings.shape[0], -1) # Reshape to (num_samples, 128)
+train_embeddings = train_embeddings / np.linalg.norm(
+    train_embeddings, axis=1, keepdims=True
+)
+def generate_medical_report(pred_class, confidence):
+    if pred_class == 1:
+        report = f"""
+        MEDICAL REPORT
+        -------------------------
+        Findings:
+        Chest X-ray shows abnormal opacities in lung regions.
+
+        Impression:
+        Findings are suggestive of Pneumonia.
+
+        Model Confidence:
+        {confidence:.2f}
+
+        Recommendation:
+        Immediate clinical correlation and radiologist review advised.
+        """
+    else:
+        report = f"""
+        MEDICAL REPORT
+        -------------------------
+        Findings:
+        Lung fields appear clear with no visible consolidation.
+
+        Impression:
+        No radiographic evidence of Pneumonia.
+
+        Model Confidence:
+        {confidence:.2f}
+
+        Recommendation:
+        Routine follow-up if symptoms persist.
+        """
+    return report
+def retrieve_similar_images(query_img, top_k=5):
+    # Extract query embedding
+    query_emb = feature_model.predict(query_img[np.newaxis, ...])
+    query_emb = query_emb / np.linalg.norm(query_emb)
+
+    # Compute cosine similarity
+    similarity_scores = cosine_similarity(query_emb, train_embeddings)[0]
+
+    # Get top-k similar images
+    top_indices = np.argsort(similarity_scores)[-top_k:][::-1]
+    return top_indices
+def show_retrieval_results(query_img, retrieved_indices):
+    plt.figure(figsize=(15, 4))
+
+    # Show query image
+    plt.subplot(1, len(retrieved_indices) + 1, 1)
+    plt.imshow(query_img.squeeze(), cmap='gray')
+    plt.title("Query Image")
+    plt.axis('off')
+
+    # Show retrieved images
+    for i, idx in enumerate(retrieved_indices):
+        plt.subplot(1, len(retrieved_indices) + 1, i + 2)
+        plt.imshow(X_train[idx].squeeze(), cmap='gray')
+        plt.title(f"Similar {i+1}")
+        plt.axis('off')
+
+    plt.show()
+def full_medical_ai_pipeline(test_index=0, top_k=5):
+
+    # Load test image
+    image = X_test[test_index]
+
+    # Predict class
+    prediction = model.predict(image[np.newaxis, ...])
+    pred_class = np.argmax(prediction)
+    confidence = np.max(prediction)
+
+    # Generate report
+    report = generate_medical_report(pred_class, confidence)
+
+    # Retrieve similar images
+    retrieved_indices = retrieve_similar_images(image, top_k)
+
+    # Display outputs
+    print(report)
+    show_retrieval_results(image, retrieved_indices)
+!pip install opencv-python
+import cv2
+import numpy as np
+
+def upscale_image(img, size=224):
+    """
+    Upscale low-res X-ray images using bicubic interpolation
+    """
+    img = img.squeeze()
+    img = cv2.resize(img, (size, size), interpolation=cv2.INTER_CUBIC)
+    img = np.clip(img, 0, 1)
+    return img
+def generate_gradcam(img, model, last_conv_layer):
+    img_batch = img[np.newaxis, ...]
+
+    grad_model = tf.keras.models.Model(
+        model.inputs,
+        [model.get_layer(last_conv_layer).output, model.output]
+    )
+
+    with tf.GradientTape() as tape:
+        conv_out, preds = grad_model(img_batch)
+        class_idx = tf.argmax(preds[0])
+        loss = preds[:, class_idx]
+
+    grads = tape.gradient(loss, conv_out)
+    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+    conv_out = conv_out[0]
+
+    heatmap = conv_out @ pooled_grads[..., tf.newaxis]
+    heatmap = tf.squeeze(heatmap)
+    heatmap = np.maximum(heatmap, 0)
+    heatmap /= np.max(heatmap) + 1e-8
+
+    return heatmap
+def save_gradcam_image(img, heatmap, filename):
+    img = upscale_image(img, 224)
+    img_uint8 = np.uint8(255 * img)
+
+    heatmap = cv2.resize(heatmap, (224, 224))
+    heatmap = np.uint8(255 * heatmap)
+    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+
+    overlay = cv2.addWeighted(
+        cv2.cvtColor(img_uint8, cv2.COLOR_GRAY2BGR),
+        0.6,
+        heatmap,
+        0.4,
+        0
+    )
+
+    cv2.imwrite(filename, overlay)
+def save_retrieval_images(query_img, retrieved_idx):
+    query_path = "query_image.png"
+    cv2.imwrite(query_path, np.uint8(255 * upscale_image(query_img)))
+
+    retrieved_paths = []
+    for i, idx in enumerate(retrieved_idx):
+        path = f"retrieved_{i+1}.png"
+        cv2.imwrite(path, np.uint8(255 * upscale_image(X_train[idx])))
+        retrieved_paths.append(path)
+
+    return query_path, retrieved_paths
+!pip install reportlab
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4
+
+def generate_complete_pdf(
+    filename,
+    diagnosis,
+    confidence,
+    query_img_path,
+    gradcam_img_path, # This can now be None
+    retrieved_img_paths
+):
+    styles = getSampleStyleSheet()
+    doc = SimpleDocTemplate(filename, pagesize=A4)
+    elements = []
+
+    elements.append(Paragraph("<b>Automated Chest X-ray Medical Report</b>", styles["Title"]))
+    elements.append(Spacer(1, 12))
+
+    elements.append(Paragraph(f"<b>Diagnosis:</b> {diagnosis}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>Model Confidence:</b> {confidence:.2f}", styles["Normal"]))
+    elements.append(Spacer(1, 12))
+
+    elements.append(Paragraph("<b>Query Chest X-ray</b>", styles["Heading2"]))
+    elements.append(Image(query_img_path, width=200, height=200))
+    elements.append(Spacer(1, 12))
+
+    if gradcam_img_path: # Only add Grad-CAM if path is provided
+        elements.append(Paragraph("<b>Grad-CAM Visualization</b>", styles["Heading2"]))
+        elements.append(Image(gradcam_img_path, width=200, height=200))
+        elements.append(Spacer(1, 12))
+
+    elements.append(Paragraph("<b>Semantically Similar Images</b>", styles["Heading2"]))
+    for path in retrieved_img_paths:
+        elements.append(Image(path, width=120, height=120))
+        elements.append(Spacer(1, 6))
+
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(
+        "<b>Clinical Recommendation:</b> "
+        "Radiologist verification and clinical correlation advised.",
+        styles["Normal"]
+    ))
+
+    doc.build(elements)
+def run_full_clear_pipeline(
+    keras_model,        # ✅ real tf.keras.Model
+    feature_model,      # embedding model
+    test_index=10,
+    top_k=5
+):
+
+    img = X_test[test_index]
+
+    # --- Prediction ---
+    preds = keras_model.predict(img[np.newaxis, ...])
+    cls = np.argmax(preds)
+    conf = np.max(preds)
+
+    diagnosis = "Pneumonia Detected" if cls == 1 else "Normal Chest X-ray"
+
+    # --- Grad-CAM ---
+    heatmap = generate_gradcam(
+        img,
+        keras_model,
+        last_conv_layer="conv5_block16_concat"
+    )
+
+    gradcam_path = "gradcam.png"
+    save_gradcam_image(img, heatmap, gradcam_path)
+
+    # --- Retrieval ---
+    retrieved = retrieve_similar_images(img, top_k)
+    query_path, retrieved_paths = save_retrieval_images(img, retrieved)
+
+    # --- PDF ---
+    pdf_name = "Final_Medical_Report.pdf"
+    generate_complete_pdf(
+        pdf_name,
+        diagnosis,
+        conf,
+        query_path,
+        gradcam_path,
+        retrieved_paths
+    )
+
+    print("✅ Clear medical report generated:", pdf_name)
+full_medical_ai_pipeline(test_index=10, top_k=5)
