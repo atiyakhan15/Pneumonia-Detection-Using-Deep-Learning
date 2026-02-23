@@ -18,6 +18,7 @@ This project implements a transfer learning-based deep learning model for automa
 
 ## 🚀 How to Run
 ```bash
-pip install torch torchvision medmnist scikit-learn matplotlib tqdm
+pip install -q medmnist torch torchvision scikit-learn matplotlib seaborn faiss-cpu transformers accelerate pil
 pip install -r requirements.txt
+
 
