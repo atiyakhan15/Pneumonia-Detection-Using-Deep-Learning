@@ -1,6 +1,6 @@
 # 🩺Postdoctoral Technical Challenge: AI Medical Imaging System
 
-This repository contains a complete end-to-end AI system developed as part of the 7-Day Postdoctoral Technical Challenge on AI Medical Imaging, Visual Language Models, and Semantic Retrieval.
+This repository contains a complete end-to-end AI system developed as part of the Challenge on AI Medical Imaging, Visual Language Models, and Semantic Retrieval.
 
 The system integrates three interconnected tasks using the PneumoniaMNIST (MedMNIST v2) dataset:
 
@@ -8,8 +8,6 @@ The system integrates three interconnected tasks using the PneumoniaMNIST (MedMN
 2.Medical report generation using a visual language model (VLM)
 3.Semantic image retrieval using medical image embeddings and a vector database
 
-
-Here is a **reframed and expanded paragraph** that accurately reflects the **complete end-to-end implementation of all three tasks (classification, report generation, and retrieval)**, while maintaining an academic and research-oriented tone suitable for a PhD/postdoctoral submission:
 
 This work presents a comprehensive end-to-end AI framework for pneumonia analysis using the PneumoniaMNIST dataset, integrating image classification, medical report generation, and semantic image retrieval. In the first stage, a convolutional neural network–based classifier is developed to distinguish between normal and pneumonia chest X-ray images using a rigorously designed training, validation, and testing pipeline. Medical-image–specific preprocessing, data augmentation, and systematic evaluation using accuracy, precision, recall, F1-score, and ROC-AUC demonstrate the robustness of the classification model, while confusion matrix analysis and failure case visualization provide insights into model limitations. 
 
@@ -24,6 +22,7 @@ This project implements a transfer learning-based deep learning model for automa
 - Python
 - PyTorch
 - DenseNet121
+- Resnet50
 - MedMNIST
 - Finetuned CNN
 
