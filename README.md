@@ -24,7 +24,7 @@ This project implements a transfer learning-based deep learning model for automa
 - DenseNet121
 - Resnet50
 - MedMNIST
-- Finetuned CNN
+- CNN
 
 ## 📊 Results
 - Accuracy: 94%
