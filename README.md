@@ -1,4 +1,4 @@
-# 🩺Postdoctoral Technical Challenge: AI Medical Imaging System
+# 🩺Pnemonia Detection Challenge: AI Medical Imaging System
 
 This repository contains a complete end-to-end AI system developed as part of the Challenge on AI Medical Imaging, Visual Language Models, and Semantic Retrieval.
 
