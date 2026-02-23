@@ -1,6 +1,21 @@
-# 🩺 Pneumonia Detection Using Deep Learning  
+# 🩺Postdoctoral Technical Challenge: AI Medical Imaging System
 
-This work explores pneumonia detection using the PneumoniaMNIST dataset by benchmarking a baseline CNN against deeper architectures such as DenseNet121. The first experimental setting restricts training to a minimal, class-balanced subset of samples per class, excluding the use of pretrained models or auxiliary datasets. Within this constrained framework, fiine tune CNN model consistently outperforms the baseline CNN, underscoring the advantage of residual learning in low-data scenarios. Subsequently, the study extends to a transfer learning paradigm, where DenseNet121 pretrained on ImageNet is employed. The integration of pretrained knowledge leads to marked improvements in classification accuracy and generalization, emphasizing the importance of deep feature reuse and external representation learning in medical imaging applications.
+This repository contains a complete end-to-end AI system developed as part of the 7-Day Postdoctoral Technical Challenge on AI Medical Imaging, Visual Language Models, and Semantic Retrieval.
+
+The system integrates three interconnected tasks using the PneumoniaMNIST (MedMNIST v2) dataset:
+
+1.CNN-based pneumonia classification
+2.Medical report generation using a visual language model (VLM)
+3.Semantic image retrieval using medical image embeddings and a vector database
+
+
+Here is a **reframed and expanded paragraph** that accurately reflects the **complete end-to-end implementation of all three tasks (classification, report generation, and retrieval)**, while maintaining an academic and research-oriented tone suitable for a PhD/postdoctoral submission:
+
+This work presents a comprehensive end-to-end AI framework for pneumonia analysis using the PneumoniaMNIST dataset, integrating image classification, medical report generation, and semantic image retrieval. In the first stage, a convolutional neural network–based classifier is developed to distinguish between normal and pneumonia chest X-ray images using a rigorously designed training, validation, and testing pipeline. Medical-image–specific preprocessing, data augmentation, and systematic evaluation using accuracy, precision, recall, F1-score, and ROC-AUC demonstrate the robustness of the classification model, while confusion matrix analysis and failure case visualization provide insights into model limitations. 
+
+Building upon the classification results, the second stage incorporates a medical visual language model to generate clinically meaningful radiology-style reports directly from chest X-ray images. Prompt-engineered report generation enables qualitative comparison between model predictions, ground-truth labels, and linguistic descriptions, highlighting the interpretability and complementary role of multimodal models in clinical decision support. Finally, the framework is extended to a semantic image retrieval system, where learned image embeddings and a FAISS-based vector index enable both image-to-image and text-to-image retrieval. 
+
+Retrieval performance is quantitatively assessed using Precision@k and qualitatively analyzed through visual inspection of retrieved cases. Together, these components demonstrate a unified, reproducible pipeline that combines diagnosis, explanation, and case-based reasoning, illustrating the potential of integrated multimodal AI systems for medical imaging applications.
 
 ## 📌 Overview
 This project implements a transfer learning-based deep learning model for automatic pneumonia detection from chest X-ray images.
